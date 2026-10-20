@@ -1,0 +1,21 @@
+:root { color-scheme: dark; --ink: #e8e4dc; --dim: #9a948a; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0c0d10; color: var(--ink);
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#hud { position: fixed; top: 0; left: 0; max-width: 23rem; padding: 1.1rem 1.3rem; pointer-events: none; }
+#hud > * { pointer-events: auto; }
+h1 { margin: 0 0 .15rem; font-size: 1.35rem; font-weight: 600; letter-spacing: .01em; }
+.sub { margin: 0 0 .9rem; color: var(--dim); font-size: .82rem; max-width: 20rem; }
+#stats { font-variant-numeric: tabular-nums; font-size: .8rem; }
+#stats table { border-collapse: collapse; }
+#stats td { padding: .08rem .55rem .08rem 0; }
+#stats td:first-child { color: var(--dim); }
+.bar { display: inline-block; height: .5rem; background: #4a8fb8; border-radius: 1px; vertical-align: middle; }
+.bar.shut { background: #b8584a; }
+.row { margin-top: .9rem; display: flex; flex-wrap: wrap; gap: .4rem; }
+button { font: inherit; font-size: .8rem; padding: .3rem .7rem; border-radius: .3rem;
+  border: 1px solid #3a3d44; background: #191b20; color: var(--ink); cursor: pointer; }
+button:hover { background: #22252b; }
+button[aria-pressed="true"] { background: #2d4a5c; border-color: #4a8fb8; }
+.note { margin: .9rem 0 0; color: var(--dim); font-size: .72rem; max-width: 20rem; }

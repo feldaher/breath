@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breath</title>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="hud">
+      <h1>Breath</h1>
+      <p class="sub">An alveolar sac, breathing. Eight alveoli, each holding the measured mean volume of 4.2 × 10<sup>6</sup> µm³.</p>
+      <div id="stats"></div>
+      <div class="row">
+        <button id="pause">Pause</button>
+        <button id="surf">Take the surfactant from one</button>
+        <button id="peep">Apply pressure</button>
+        <button id="reset">Reset</button>
+      </div>
+      <p class="note">Drag to turn. The wall is drawn as a membrane, which is what a 12&nbsp;µm septum is. Pressure is in solver units calibrated to a 5&nbsp;cmH₂O swing; see the model spec.</p>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
