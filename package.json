@@ -1,0 +1,23 @@
+{
+  "name": "breath",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@feldaher/cell-engine": "github:feldaher/cell-engine#v0.3.0"
+  },
+  "devDependencies": {
+    "@amiceli/vitest-cucumber": "^5.2.1",
+    "@webgpu/types": "^0.1.74",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7"
+  }
+}
