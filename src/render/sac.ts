@@ -11,14 +11,35 @@ export interface Camera {
   dist: number;
 }
 
-/** Colour of each alveolus: open ones blue, collapsed ones red, shaded by facing. */
-function shade(open: boolean, lambert: number): string {
-  const l = 0.25 + 0.75 * Math.max(0, lambert);
-  const [r, g, b] = open ? [92, 150, 190] : [190, 96, 80];
-  return `rgb(${Math.round(r * l)},${Math.round(g * l)},${Math.round(b * l)})`;
+import { CellState, type Epithelium } from '../contracts';
+
+/** How the sac is coloured: by which alveoli are open, or by what the cells are doing. */
+export type View = 'alveoli' | 'cells' | 'virions';
+
+const STATE_RGB: Record<number, [number, number, number]> = {
+  [CellState.Healthy]: [92, 150, 190],
+  [CellState.Eclipse]: [190, 170, 90],
+  [CellState.Producing]: [205, 110, 60],
+  [CellState.Apoptotic]: [170, 70, 70],
+  [CellState.Dead]: [85, 80, 78],
+  [CellState.Denuded]: [60, 56, 54],
+};
+
+function rgb([r, g, b]: [number, number, number], l: number): string {
+  const k = 0.25 + 0.75 * Math.max(0, l);
+  return `rgb(${Math.round(r * k)},${Math.round(g * k)},${Math.round(b * k)})`;
 }
 
-export function drawSac(ctx: CanvasRenderingContext2D, b: Breathing, cam: Camera, dpr: number): void {
+export interface SacView {
+  view: View;
+  epi?: Epithelium;
+  /** Nodal virion concentration, for the virion view. */
+  virion?: Float64Array;
+  /** Concentration drawn as fully saturated. */
+  virionFull?: number;
+}
+
+export function drawSac(ctx: CanvasRenderingContext2D, b: Breathing, cam: Camera, opt: SacView): void {
   const { width, height } = ctx.canvas;
   ctx.clearRect(0, 0, width, height);
   const m = b.acinus.membrane;
@@ -37,8 +58,6 @@ export function drawSac(ctx: CanvasRenderingContext2D, b: Breathing, cam: Camera
     vx[i] = ox + x1 * scale; vy[i] = oy - y1 * scale; vz[i] = z2;
   }
 
-  // Which alveolus each triangle belongs to, and whether it is open.
-  const owner = ownerOf(b.acinus);
   // Back-face cull in screen space, then sort what is left back to front.
   const tris = m.tris;
   const visible: number[] = [];
@@ -50,17 +69,29 @@ export function drawSac(ctx: CanvasRenderingContext2D, b: Breathing, cam: Camera
     depth[t / 3] = vz[a] + vz[c] + vz[d];
   }
   const order = visible.sort((p, q) => depth[p / 3] - depth[q / 3]);
+  const owner = ownerOf(b.acinus);
+  const full = opt.virionFull ?? 0.02;
 
   for (const t of order) {
     const a = tris[t], c = tris[t + 1], d = tris[t + 2];
-    // Flat shading from the un-projected normal, lit from over the viewer's shoulder.
     const ux = m.pos[3 * c] - m.pos[3 * a], uy = m.pos[3 * c + 1] - m.pos[3 * a + 1], uz = m.pos[3 * c + 2] - m.pos[3 * a + 2];
     const wx = m.pos[3 * d] - m.pos[3 * a], wy = m.pos[3 * d + 1] - m.pos[3 * a + 1], wz = m.pos[3 * d + 2] - m.pos[3 * a + 2];
     let nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
     const len = Math.hypot(nx, ny, nz) || 1;
     nx /= len; ny /= len; nz /= len;
     const lx = cy * 0.4 + sy * 0.8, lz = -sy * 0.4 + cy * 0.8;
-    ctx.fillStyle = shade(b.open[owner[t / 3]] === 1, nx * lx + ny * 0.45 + nz * lz);
+    const lambert = nx * lx + ny * 0.45 + nz * lz;
+
+    let colour: string;
+    if (opt.view === 'cells' && opt.epi) {
+      colour = rgb(STATE_RGB[opt.epi.state[opt.epi.nodeCell[a]]] ?? STATE_RGB[CellState.Healthy], lambert);
+    } else if (opt.view === 'virions' && opt.virion) {
+      const v = Math.min(1, Math.max(0, (opt.virion[a] + opt.virion[c] + opt.virion[d]) / 3) / full);
+      colour = rgb([60 + 170 * v, 70 + 40 * (1 - v), 90 - 40 * v], lambert);
+    } else {
+      colour = rgb(b.open[owner[t / 3]] === 1 ? [92, 150, 190] : [190, 96, 80], lambert);
+    }
+    ctx.fillStyle = colour;
     ctx.beginPath();
     ctx.moveTo(vx[a], vy[a]);
     ctx.lineTo(vx[c], vy[c]);
@@ -68,7 +99,6 @@ export function drawSac(ctx: CanvasRenderingContext2D, b: Breathing, cam: Camera
     ctx.closePath();
     ctx.fill();
   }
-  void dpr;
 }
 
 const owners = new WeakMap<Acinus, Uint16Array>();

@@ -30,4 +30,12 @@ To work on the engine at the same time, clone it next door (`projects/cell-engin
 
 ## Where it is
 
-Phase 1, in progress. The sac is built and breathes: eight closed membrane bubbles welded into one body, each holding the measured alveolar volume, each with its own tidal excursion, collapsing when it loses surfactant and needing a real pressure to reopen. Cells, fields, macrophages, interventions and challenges come next.
+Phase 1 is playable. Eight alveoli, 936 epithelial cells, 240 macrophages; virions and interferon
+diffusing over the sac and crossing septa; infected cells running the measured course and dying;
+dead AT2 costing an alveolus its surfactant until it collapses, dead AT1 baring the membrane until
+it floods. Infect it, give an antiviral or interferon, and watch three readouts.
+
+Measured at 14 µm: about 9 ms a frame at 60 simulated minutes a second.
+
+Still to come: neutrophils and T cells (the immunopathology), challenge cards with a verdict,
+the field notebook, a proper P–V loop, and the airway with its mucus.

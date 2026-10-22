@@ -51,7 +51,13 @@ export const CellState = {
 } as const;
 export type CellStateId = (typeof CellState)[keyof typeof CellState];
 
-/** The epithelium as typed arrays, one entry per cell (structure of arrays). */
+/**
+ * The epithelium as typed arrays, one entry per cell (structure of arrays).
+ *
+ * A cell is a POINT on the surface carrying an area, not a patch of mesh. An AT2 cell is about
+ * 12 µm across and the mesh is coarser than that, so patches would be a cell per triangle at
+ * best; this way the cells and the mesh are independent, and a field is smooth over a cell.
+ */
 export interface Epithelium {
   n: number;
   kind: Uint8Array;
@@ -61,14 +67,16 @@ export interface Epithelium {
   timer: Float32Array;
   /** Interferon protection, 0-1 (E13). */
   prot: Float32Array;
-  /** Patch area, µm². */
+  /** The area of surface this cell holds, µm². */
   areaUm2: Float32Array;
   /** Which alveolus the cell belongs to. */
   alveolus: Uint16Array;
-  /** Cell centre in rest space, xyz. */
+  /** Where the cell sits, in rest space: xyz per cell. */
   centre: Float32Array;
-  /** Which cell owns each surface vertex; length = number of surface vertices. */
-  vertexCell: Uint32Array;
+  /** The membrane node the cell reads its fields from and secretes into. */
+  node: Uint32Array;
+  /** For drawing only: the nearest cell to each membrane node. */
+  nodeCell: Uint32Array;
 }
 
 /** Immune agents riding on the alveolar surface. */
@@ -106,7 +114,13 @@ export interface PathogenSpec {
   id: string;
   name: string;
   kind: 'virus';
-  /** Relative susceptibility by cell kind (SARS-CoV-2: AT2 >> AT1, via ACE2/TMPRSS2). */
+  /**
+   * Relative susceptibility by cell kind, PER UNIT AREA — receptor density, in effect.
+   *
+   * It is multiplied by the cell's own area in E12, so the per-cell ordering is not the same as
+   * the ordering here: an AT1 cell holds about 28 times the area of an AT2 cell, so a density
+   * ratio of 100 : 1 comes out as a per-cell ratio of only about 3.6 : 1.
+   */
   tropism: Partial<Record<EpiKind, number>>;
   /** Rate constant of E12, per virion per minute. */
   infectivity: Graded;

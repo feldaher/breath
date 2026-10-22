@@ -46,3 +46,17 @@ export function pieces(a: Acinus): number {
   for (const w of a.welds) parent[find(w.a)] = find(w.b);
   return new Set(a.alveoli.map((_, i) => find(i))).size;
 }
+
+export { placeEpithelium, EPI_KINDS, kindId, areaShare } from '../src/cells/epithelium';
+export { makeFields, stepField, totalAmount, refitFields } from '../src/fields/surface';
+
+/** A deterministic generator for tests. */
+export function seeded(seed = 11) {
+  let s = seed >>> 0 || 1;
+  return () => {
+    s ^= s << 13; s >>>= 0;
+    s ^= s >> 17;
+    s ^= s << 5; s >>>= 0;
+    return s / 4294967296;
+  };
+}

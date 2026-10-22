@@ -9,15 +9,29 @@
     <canvas id="view"></canvas>
     <div id="hud">
       <h1>Breath</h1>
-      <p class="sub">An alveolar sac, breathing. Eight alveoli, each holding the measured mean volume of 4.2 × 10<sup>6</sup> µm³.</p>
+      <p class="sub">An alveolar sac you can infect. Eight alveoli, 936 cells, 240 macrophages.</p>
+
+      <div class="seg" id="views">
+        <button data-view="alveoli" aria-pressed="true">Alveoli</button>
+        <button data-view="cells">Cells</button>
+        <button data-view="virions">Virions</button>
+      </div>
+
       <div id="stats"></div>
+      <canvas id="plot" width="300" height="78"></canvas>
+      <div id="legend"></div>
+
+      <div class="row">
+        <button id="infect">Infect</button>
+        <button id="antiviral">Antiviral</button>
+        <button id="ifn">Interferon</button>
+      </div>
       <div class="row">
         <button id="pause">Pause</button>
-        <button id="surf">Take the surfactant from one</button>
-        <button id="peep">Apply pressure</button>
+        <button id="slow">1× speed</button>
         <button id="reset">Reset</button>
       </div>
-      <p class="note">Drag to turn. The wall is drawn as a membrane, which is what a 12&nbsp;µm septum is. Pressure is in solver units calibrated to a 5&nbsp;cmH₂O swing; see the model spec.</p>
+      <p class="note" id="about"></p>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
